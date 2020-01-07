@@ -12,10 +12,11 @@ La pràctica ha estat realitzada individualment per l'**Eduard Ruiz Solé**.
 
 ## Documents
 
-- /code/RainAustralia.rmd : Codi amb el programari R.
+- /code/RainAustralia.Rmd : Codi amb el programari R.
 - /csv/weatherAUS.csv : Document amb el dataset original.
 - /csv/weatherAUS_clean.csv : Document amb el dataset final.
-- /pdf/Pràctica 2. Data Cleaning : Document amb les respostes de la pràctica 2.
+- /pdf/Pràctica 2. Data Cleaning : Document pdf amb les respostes de la pràctica 2.
+- /pdf/RainAustralia.html : Document html amb les respostes de la pràctica 2.
 
 ## Recursos
 
