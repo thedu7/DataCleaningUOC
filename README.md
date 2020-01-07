@@ -4,11 +4,18 @@
 
 ## Descripció
 
-Esta práctica se ha realizado bajo el contexto de la asignatura Tipología y ciclo de vida de los datos, perteneciente al Máster en Ciencia de Datos de la Universitat Oberta de Catalunya. En ella, se aplican técnicas de limpieza y validación de los datos mediante el lenguaje de programación R para disponer de un set de datos de alta calidad.
+Aquesta segona pràctica de l'assignatura, Tipologia y cicle de vida de dades del màster de Data Science de la UOC (Universitat Oberta de Catalunya), es pretén analitzar un dataset mitjançant l'aplicació de mètodes de estadístics. Per comprobar els coneixements adquirits al llarg de la pràctica, adjunto en aquest repositori un exemple d'extracció de dades de la web **https://www.kaggle.com/jsphyg/weather-dataset-rattle-package**.
 
-## Miembros del equipo
+## Equip
 
-La actividad ha sido realizada por Carla Comas Garcia y Luis Manuel Camacho Puerma.
+La pràctica ha estat realitzada individualment per l'**Eduard Ruiz Solé**.
+
+## Documents
+
+- /code/RainAustralia.rmd : Codi amb el programari R.
+- /csv/weatherAUS.csv : Document amb el dataset original.
+- /csv/weatherAUS_clean.csv : Document amb el dataset final.
+- /pdf/Pràctica 2. Data Cleaning : Document amb les respostes de la pràctica 2.
 
 ## Recursos
 
