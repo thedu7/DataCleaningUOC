@@ -1,0 +1,497 @@
+---
+title: "Pràctica 2. Data Cleaning"
+author: "Eduard Ruiz Sole"
+date: "Gener 2020"
+output:
+  word_document:
+    toc: yes
+    toc_depth: '2'
+  pdf_document:
+    toc: yes
+    toc_depth: '2'
+  html_document:
+    highlight: default
+    number_sections: yes
+    theme: cosmo
+    toc: yes
+    toc_depth: 2
+---
+
+# Detalls de la pràctica
+
+## Descripció
+
+En aquesta pràctica s’elabora un cas pràctic orientat a aprendre a identificar les dades rellevants per un projecte analític i usar les eines d’integració, neteja, validació i anàlisi de les mateixes.
+
+## Objectius
+
+Els objectius concrets d’aquesta pràctica són:
+
+* Aprendre a aplicar els coneixements adquirits i la seva capacitat de resolució de problemes en entorns nous o poc coneguts dintre de contextos més amplis o multidisciplinaris.
+
+* Saber identificar les dades rellevants i els tractaments necessaris (integració, neteja i validació) per dur a terme un projecte analític.
+
+* Aprendre a analitzar les dades adequadament per abordar la informació continguda en les dades.
+
+* Identificar la millor representació dels resultats per tal d’aportar conclusions sobre el problema plantejat en el procés analític.
+
+* Actuar amb els principis ètics i legals relacionats amb la manipulació de dades en funció de l'àmbit d'aplicació.
+
+* Desenvolupar les habilitats d'aprenentatge que els permetin continuar estudiant d'una manera que haurà de ser en gran manera autodirigida o autònoma.
+
+* Desenvolupar la capacitat de cerca, gestió i ús d'informació i recursos en l'àmbit de la
+ciència de dades.
+
+## Competències
+
+En aquesta pràctica es desenvolupen les següents competències del Màster de Data Science:
+
+* Capacitat d'analitzar un problema en el nivell d'abstracció adequat a cada situació i aplicar
+les habilitats i coneixements adquirits per abordar-lo i resoldre'l.
+
+* Capacitat per aplicar les tècniques específiques de tractament de dades (integració,
+transformació, neteja i validació) per al seu posterior anàlisi.
+
+# Resolució
+
+## Descripció del dataset.
+
+El conjunt de dades a analitzar s'ha obtingut a partir del següent enllaç [kaggle](https://www.kaggle.com/jsphyg/weather-dataset-rattle-package), està format per 24 variables i un total de 142193 registres a analitzar. A continuació es detallaran les característiques de les variables :
+
+* **Date :** Data de l'observació.
+
+* **Location :** Ubicació de l'estació meteorològica que recull les dades.
+
+* **MinTemp :** Temperatura mínima en graus Celsius.
+
+* **MaxTemp :** Temperatura màxima en graus Celsius.
+
+* **Rainfall :** Quantitat d'aigua registrada en mm (1L/m2).
+
+* **Evaporation :** Quantitat d'evaporació en mm (1L/m2) en les últimes 24 hores fins les 9 del matí.
+
+* **Sunshine :** Nombre d'hores de sol al dia.
+
+* **WindGustDir :** La direcció de la ratxa de vent més forta en les últimes 24 hores fins a la mitjanit.
+
+* **WindGustSpeed :** La velocitat (km/h) de la ràfega més forta de vent en les últimes 24 hores fins a la mitjanit.
+
+* **WindDir9am :** Direcció del vent a les 9h00 del matí.
+
+* **WindDir3pm :** Direcció del vent a les 15h00 del migdia.
+
+* **WindSpeed9am :** Mitjana de la velocitat del vent (km/h) dels 10 minuts abans de les 9h00 del matí.
+
+* **WindSpeed3pm :** Mitjana de la velocitat del vent (km/h) dels 10 minuts abans de les 15h00 del migdia.
+
+* **Humidity9am :** Percentatge d'humitat a les 9h00 del matí.
+
+* **Humidity3pm :** Percentatge d'humitat a les 15h00 del migdia.
+
+* **Pressure9am :** Pressió atmosfèrica (hpa), reduida al nivell mitjà del mar, a les 9h00 del matí.
+
+* **Pressure3pm :** Pressió atmosfèrica (hpa), reduida al nivell mitjà del mar, a les 15h00 del migdia.
+
+* **Cloud9am :** Fracció del cel enfosquit pels núvols a les 9h00 del matí (mesura en "oktas"). Es registra quantes oktas del cel estan enfosquides pels núvols. Una mesura de 0 indica un cel completament clar mentre que un 8 indica que està completament ennuvolat.
+
+* **Cloud3pm :** Fracció del cel enfosquit pels núvols a les 15h00 del migdia.
+
+* **Temp9am :** Temperatura en graus Celsius a les 9h00 del matí.
+
+* **Temp3pm :** Temperatura en graus Celsius a les 15h00 del migdia.
+
+* **RainToday :** Boolean: 1, si la precipitació en les últimes 24 hores fins a les 9h00 del matí supera 1 mm ((1L/m2)), pel contrari, pren el valor 0.
+
+* **RISK_MM :** Quantitat de pluja del dia següent en mm. S'utilitza per crear la variable "RainTomorrow".
+
+* **RainTomorrow :** Representa la variable objectiu. Ha plogut demà?
+
+## Perquè és important i quina pregunta/problema pretén respondre?
+
+Tal i com es pot comprovar en la definició de les variables, explicada en l'apartat anterior, l'objectiu precís d'aquesta pràctica és trobar un model que sigui capaç de determinar si el dia següent, al present, plourà o no a Australia. Els models de regressió permetran preedir si plou o no, en funció de les característiques i propietats del conjunt de variables i registres.
+
+Un cop definit l'objectiu principal, hi han altres incògnites a resoldre, com per exemple, determinar quines són les variables que més influeixen en la hipòtesi de pluja.
+Aquests anàlisis poden ser de gran rellevància en qualsevol sector relacionat amb la meteorologia. Com per exemple les múltiples apps de previsió de temperatures i pluges que sovint s'equivoquen i ens fan agafar el paraigües quan no és necessàri o situacions contràries.
+
+## Integració i selecció de les dades d’interès a analitzar
+
+La font de dades correspont a un fitxer CSV descarregat des del lloc web Kaggle. La funció read.csv() extraurà les dades i crearà un objecte de tipus data.frame :
+
+```{r,eval=TRUE,echo=TRUE}
+# Càrrega i breu visualització del fitxer weatherAUS.csv
+setwd("/Users/eduardruiz/Desktop/EDU/Data Science/M2.951 Tipologia i cicle de vida de les dades/Neteja i anàlisi de dades/Rain in Australia/")
+data <- read.csv("weatherAUS.csv", header = TRUE)
+head(data)
+```
+
+Un cop carregat el conjunt de dades, el primer pas consisteix en determinar la tipologia de les variables que han de ser analitzades i decidir quines no representen cap interès en l'estudi, per poder procedir a eliminar-les. La funció summary ajuda a tenir una perspectiva més global del conjunt de dades i permet extreure les primeres conclusions.
+
+```{r,eval=TRUE,echo=TRUE}
+# Visualització del tipus de variable
+sapply(data, function(x) class(x))
+summary(data)
+```
+
+La primera conclusió que s'extreu és la gran quantitat de valor perduts (NA's) i l'existència de valors extrems. Totes aquestes anomalies seran tractades en els pròxims apartats.
+
+Una vegada observades totes les dades disponibles, seleccionarem aquelles que siguin d'interès i aportin valor al anàlisi que es vol realitzar. En aquest cas, la variable "RISK_MM" no aporta un valor significatiu a la mostra i per tant, pot ser eliminada. Per altra banda, la resta de variables aporten positivament valor a la mostra i per tant, les deixem intactes.
+
+```{r,eval=TRUE,echo=TRUE}
+# S'elimina la columna/variable "RISK_MM"
+data <- data[, -(23)]
+```
+
+## Visualització i representació de dades
+
+La visualització de dades ajuda a interpretar moltes hipòtesis i trobar relacions entre variables que passen desapercebudes. En aquest exemple, es mostrarà mitjançant una representació visual la incògnita següent :
+
+- Quan plou un dia, sol ploure el dia següent ?
+
+```{r,warning=FALSE,message=FALSE}
+library(tidyverse)
+```
+```{r,eval=TRUE,echo=TRUE}
+data1 <- data
+
+data1 = data1 %>% 
+    mutate_at(vars(Location, WindGustDir, WindDir9am, WindDir3pm, RainToday, RainTomorrow), as.factor)
+
+data1 %>% summarise_each(list(~ sum(is.na(.)) / length(.) * 100)) 
+
+data1 %>%
+    group_by(RainTomorrow) %>%
+    summarise_each(list(~ sum(is.na(.)) / length(.) * 100))
+
+data1 %>%
+    ggplot(aes(x = RainToday, fill = RainTomorrow, color = RainTomorrow)) +
+    geom_bar(aes(y = ((..count..) / sum(..count..))), position = "dodge") +
+    scale_y_continuous(breaks = seq(0, 1, by = 0.05),
+                       labels = scales::percent) +
+    labs(x = "Rained Today",
+         y = "Percentage",
+         title = "Bar plot, plou el dia següent ?",
+         color = "Rained the next day",
+         fill = "Rained the next day"
+         )
+```
+
+Aquest gràfic ens permet determinar que quan plou un dia, acostuma a ploure el dia següent i per tant, no es solen produir pluges puntuals, sino més aviat de llarga durada. La visualització ens mostra un conjunt de dades buides (NA), les qual s'han d'analitzar per definir uns resultats més acurats.
+
+## Neteja de dades
+
+En aquest apartat es començarà a moldejar la mostra amb la finalitat de trobar el conjunt de dades més eficient i fàcil d'analitzar. En primer lloc, s'ajustarà la variable "Date", passant de tipus "factor" a "Date" i transformant les dates en un format més òptim, com són els mesos, tanmateix es convertiran les varibles binàries RainToday i RainTomorrow en numèriques (de ["Yes", "No"] a [1, 0]). Aquesta modificació permetrà una millor resolució del problema plantejat.
+
+```{r,warning=FALSE,message=FALSE}
+library(tidyverse)
+```
+```{r,eval=TRUE,echo=TRUE}
+# Conversió a tipus "Date"
+data$Date <- as.Date(as.character(data$Date))
+# Classificació de les dates per mesos (Jan, Feb, Mar..)
+data$Date = month.abb[lubridate::month(data$Date)]
+
+# Conversió de la variable "RainTomorrow"
+data$RainTomorrow <- str_replace_all(data$RainTomorrow, "No", "0")
+data$RainTomorrow <- str_replace_all(data$RainTomorrow, "Yes", "1")
+data$RainTomorrow <- as.integer(data$RainTomorrow)
+```
+
+En segon lloc, s'analitzaran els possibles valors errònis, ja que poden comportar confusions i resultats desviats si es tenen en compte.
+
+### - Zeros i elements buits
+
+Com ja s'ha comentat anteriorment, existeixen una gran quantitat de valors buits que representen una pèrdua d'informació i per tant, cal tractar-los de la millor manera. Existeix la possibilitat que aquests valors representin certs valors sentinella, els quals s'haurien d'analitzar, però no és el cas. A continuació es pot observar el nombre total de valors NA per cada variable i el percentatge corresponent [0-1] :
+
+```{r,warning=FALSE,message=FALSE}
+library(purrr)
+```
+```{r,eval=TRUE,echo=TRUE}
+# Visualització del nombre total de valors NA
+sapply(data, function(x) sum(is.na(x)))
+# Percentatge de valors NA per variable
+map(data, ~mean(is.na(.))) 
+```
+
+Amb aquests resultats es pot confirmar l'elevat nombre de valors buits i més concretament, en les variables "Cloud9am", "Cloud3pm", "Sunshine" i "Evaporation" el percentatge de NA's supera el 35%. Per resoldre aquest conflicte, es pot optar per :
+
+* Eliminar els registres que continguin un valor NA.
+* Eliminar les variables amb un percentatge de NA superior.
+* Imputar els valors NA.
+
+En aquest cas s'opta per eliminar els registres que contene un valor NA, ja que el total de registres (142.193) és molt elevat i es creu que no afectarà de forma significativa el resultat final de l'anàlisi.
+
+```{r,eval=TRUE,echo=TRUE}
+# Supressió dels valors NA
+data <- na.omit(data)
+# Nombre de registres finals
+nrow(data)
+# Visualització del nombre total de valors NA
+sapply(data, function(x) sum(is.na(x)))
+```
+
+Tot i que s'hagui decidit per eliminar registres i per tant, perdre certa informació, el nombre de registres totals (56.420) continua sent prou elevat per aplicar mètodes de regressió i predicció. Per tant, es considera l'opció escollida com a satisfactoria. L'última funció valida la supressió de valors NA.
+
+### - Valors extrems
+
+Un cop els valors buits ja han estat gestionats, cal tractar els anomenats valors extrems (outliers). Aquests valors s'identifiquen per ser relativament diferents a la majoria, els valors atípics s'han d'analitzar per poder afirmar si formen valors errònis o poden ser incorporats al conjunt de dades. Per trobar-los es pot utilitzar la tècnica boxplot, ja sigui de forma automàtica amb una funció present a R o amb la representació d'un diagrama de caixa. A continuació es pot veure l'aplicació d'ambdós mètodes, en aquelles variables numèriques :
+
+```{r,eval=TRUE,echo=TRUE}
+# Representació de valors extrems vía funció directa
+boxplot.stats(data$MinTemp)$out # Valors extrems en la variable "Temperatura mínima".
+boxplot.stats(data$MaxTemp)$out # Valors extrems en la variable "Temperatura màxima".
+boxplot.stats(data$Sunshine)$out # No existeixen valors extrems en la variable "Sunshine".
+boxplot.stats(data$Temp9am)$out # Valors extrems en la variable "Temperatura 9h00".
+boxplot.stats(data$Temp3pm)$out # Valors extrems en la variable "Temperatura 15h00".
+
+# Representació de valors extrems vía diagrama de caixa
+boxplot(data$Humidity3pm) # No existeixen valors extrems en la variable "Humitat 15h00".
+boxplot(data$WindSpeed3pm) # Valors extrems en la variable "WindSpeed3pm" representat per punts.
+boxplot(data$Pressure9am) # Valors extrems en la variable "Pressure9am" representat per punts.
+boxplot(data$Rainfall) # Valors extrems en la variable "Rainfall" representat per punts.
+
+# No es representaran les variables següents :
+# boxplot(data$Evaporation) # boxplot(data$WindSpeed9am) # boxplot(data$Humidity3pm)
+# boxplot(data$WindGustSpeed) # boxplot(data$WindSpeed3pm) # boxplot(data$Pressure9am)
+# boxplot(data$Humidity9am) # boxplot(data$Cloud9am)
+# boxplot(data$Pressure3pm) # boxplot(data$Cloud3pm)
+```
+
+Un cop analitzats els valors extrems obtinguts, s'ha determinat que tots els registres comprenen una part llògica i per tant són correctes. Per exemple, la variable amb més valors extrems és "Rainfall", amb valors pròxims als 200 mm. Tot i que pugui semblar una quantitat molt elevada, l'arribada d'un cicló podria comportar tals valors (més de 200 mm de pluja.) i en els últims 13 anys, a Australia, n'hi han hagut.
+No s'ha adjuntat l'anàlisi de valors extrems de totes les variables, però s'han estudiat i determinat que són correctes i per tant, es deixaran tal com estan, sense modificacions.
+
+### - Variables categòriques
+
+Per no perdre cap tipus d'informació, les variables categòriques s'han de tractar de forma correcta. És per aquest motiu que es realitzarà una transformació cap a variables numèriques, amb l'objectiu de millorar els resultats a l'hora d'aplicar qualsevol mètode d'anàlisi.
+
+La tècnica escollida per realitzar d'una manera ràpida i senzilla aquesta operació pertany a la funció dummyVars(). Aquesta dividirà les variables com tants múltiples factors tingui, com per exemple, en la variable Date, aquesta és transformarà en DateJan, DateFeb, DateMar, etc .. La funció s'aplicarà per totes les variables menys "RainTomorrow", ja que simbolitza la variable objectiu.
+
+```{r,warning=FALSE,message=FALSE}
+library(caret)
+```
+```{r,eval=TRUE,echo=TRUE}
+# Anàlisi de les variables categòriques
+dummy <- dummyVars(" ~ .", data[,1:22])
+# Nou data.frame amb les noves variables numèriques
+dataDum <- data.frame(predict(dummy, data[,1:22]))
+# Nou data.frame final
+dataFinal <- cbind(dataDum[,1:127], RainTomorrow = data$RainTomorrow)
+```
+
+El data frame (dataFinal) conté les dades preprocessades que estan llestes per ser utilitzades en la pròxima fase d'anàlisi. 
+
+Nota: Aquest data frame s'utilitzarà en cas de voler analitzar les variables categòriques. Contràriament s'utilitzarà el data frame (data).
+
+### - Exportació de les dades preprocessades 
+
+Tal i com s'ha comentat anteriorment, el data frame amb les dades preprocessades ja ha estat creat i ara toca exportar-lo per a poder ser utilitzat en la fase d'anàlisi.
+
+```{r,eval=TRUE,echo=TRUE}
+# Nou fitxer amb les dades preprocessades 
+write.csv(dataFinal, "weatherAUS_clean.csv")
+```
+
+## Anàlisi de les dades
+
+### - Selecció dels grups de dades que es volen analitzar/comparar
+
+L'objectiu de la selecció es basa en dividir la mostra en diferents sub-conjunts amb el fi de poder aplicar hipòtesis i comparar resultats d'interès, des d'un punt de vista analític. És per això que en aquest apartat es prepararan certs grups de dades, que posteriorment seran analitzats i comparats per mètodes analítics (no la totalitat).
+
+Per realitzar el filtratge, primer de tot es realitzarà una exploració de les dades i s'acotarà del total d'aquestes, aquelles que més interessen, tot això permetrà prescindir d'informació redundant.
+
+```{r,eval=TRUE,echo=TRUE}
+# Per realitzar comparacions segons les estacions de l'any, es pot dividir el conjunt de la següent manera :
+dataFinal.tardor <- dataFinal[dataFinal$DateMar == 1 | dataFinal$DateApr == 1 | dataFinal$DateMay == 1,] # Conjunt de dades a la tardor
+
+dataFinal.estiu <- dataFinal[dataFinal$DateDec == 1 | dataFinal$DateJan == 1 | dataFinal$DateFeb == 1,] # Conjunt de dades a l'estiu
+
+dataFinal.hivern <- dataFinal[dataFinal$DateJun == 1 | dataFinal$DateJul == 1 | dataFinal$DateAug == 1,] # Conjunt de dades a l'hivern
+
+dataFinal.primavera <- dataFinal[dataFinal$DateSep == 1 | dataFinal$DateOct == 1 | dataFinal$DateNov == 1,] # Conjunt de dades a la primavera
+
+# Una altra composició de conjunts de dades poden ser les ciutats d'Australia. En el cas que es vulgui analitzar la ciutat de Sydney més detalladament, es podria constituir un conjunt de dades de la següent manera :
+dataFinal.sydney <- dataFinal[dataFinal$Location.Sydney == 1,] # Conjunt de dades de Sydney
+```
+
+En cas de voler comparar mètodes estadístics sobre conjunts de dades diferents, la tècnica emprada anteriorment representa la millor forma de segmentar i dividir la mostra original en parts desitjades. En el nostre cas, es posa per exemple que ens agradaria analitzar si les pluges a la primavera són més pronunciades que a la tardor i per això s'ha dividit la mostra en "dataFinal.primavera" i "dataFinal.tardor".
+
+Nota: Les estacions meteorològiques a Autràlia no són les mateixes que a Europa.
+
+### - Comprovació de la normalitat i homogeneïtat de la variància
+
+L'objectiu d'aquest apartat, en primer lloc, és el de verificar la suposició de normalitat de les variables quantitatives que formen la mostra. En segons lloc es comprovarà la igualtat de variàncies entre els grups que s'han de comparar, és a dir, l'anàlisi d'homoscedasticitat.
+
+Les proves més habituals de normalitat, són els tests de Kolmogorov-Smirnov i de Shapiro-Wilk, tot i que en el nostre cas, s'utilitzarà la prova de normalitat de Anderson- Darling. En canvi, en les proves d'homogeneïtat de variàncies és habitual utilitzar la proba de Levene (si es segueix una distribució normal) i la de Fligner-Killeen (No paramètrica).
+
+En la comprovació de normalitat no es prenen en compte les variables categòriques, per tant, s'utilitzarà el data.frame "data" per determinar si les variables numèriques segueixen una distribució normal.
+
+Les variables seguiran una distribució normal si el p-valor obtingut és superior al nivell de significació establert de  α = 0,05.
+
+```{r,warning=FALSE,message=FALSE}
+library(nortest) 
+```
+```{r,eval=TRUE,echo=TRUE}
+# Test de normalitat
+nv = 0.05
+col.names = colnames(data)
+for (i in 1:ncol(data)) {
+  if (is.integer(data[,i]) | is.numeric(data[,i])) {
+      p_val = ad.test(data[,i])$p.value 
+      cat("Variable : ", col.names[i]," ", "p-value : ", p_val, "\n")
+    } 
+  }
+```
+
+No s'ha pogut utilitzar la prova de Shapiro (shapiro.test) per qué el màxim número de registres no pot ser superior a 5000 i el data.frame "data" en conté més. Tot i això, com es pot comprovar amb els resultats obtinguts, tots els valors p-value són inferiors al nivell de significació, fet que manifesta la no distribució normal del conjunt de variables.
+
+Degut als resultats no paramètrics de la prova de normalitat, es procedirà amb la comprovació d'homoscedasticitat amb l'aplicació del test Fligner-Killeen. 
+
+```{r,eval=TRUE,echo=TRUE}
+# Test d'homoscedasticitat
+fligner.test(Sunshine ~ RainToday, data = data)
+fligner.test(Temp9am ~ RainToday, data = data)
+fligner.test(Humidity3pm ~ RainToday, data = data)
+```
+
+En aquest apartat s'intenta trobar una variable que tingui homoscedasticitat amb el fet de que plogui avui o no. Tal i com es pot comprovar, s'obtenen p-valors molt baixos i per tant, no es pot acceptar la hipòtesi nul·la de que les variàncies d'ambdues mostres són homogènies. Tot i això, la variable que indica més concordància és la "Temp9am".
+
+## Anàlisi estadístic
+
+### - Correlació de variables
+
+La correlació és un atribut força rellevant a l'hora de buscar influències entre variables d'un conjunt. En aquest cas, s'han estudiat dos tipus de correlacions, la primera d'elles, entre totes les variables de la mostra. La segona, es centra més en les correlacions de les variables respecte si plou o no (RainToday). El test escollit per aquesta segona és el coeficient de correlació de Spearman, ja que la mostra no segueix una distribució normal.
+
+```{r,warning=FALSE,message=FALSE}
+library(corrplot) 
+```
+```{r,warning=FALSE,message=FALSE}
+# Correlació entre variables de la mostra
+numeric <- map_lgl(data, is.numeric) # Selecció de les variables numèriques
+correlations <- cor(data[,numeric]) # Correlació de les variables numèriques
+diag(correlations) <- 0
+high <- apply(abs(correlations) >= 0.7, 2, any) # Correlacions superior a 0.8
+corrplot(correlations[high, high], method = "number") # Gràfic de correlacions
+```
+
+El primer test ens mostra les variables amb una correlació superior a 0.7 (alta). Com es pot observar, hi ha una forta cohesió entre les variables : MinTemp, MaxTemp, Sunshine, Preassure9am, Preassure3pm, Cloud3pm, Temp9am i Temp3pm.
+
+```{r,warning=FALSE,message=FALSE}
+# Correlació Spearman respecte la variable "RainToday"
+data$RainToday <- as.character(data$RainToday)
+data$RainToday <- replace(data$RainToday, data$RainToday == "No", 0)
+data$RainToday <- replace(data$RainToday, data$RainToday == "Yes", 1)
+data$RainToday <- as.integer(data$RainToday)
+
+corr_matrix <- matrix(nc = 2, nr = 0) 
+colnames(corr_matrix) <- c("estimate", "p-value")
+
+for (i in 2:(ncol(data))) { 
+  if (is.integer(data[,i]) | is.numeric(data[,i])) { 
+    spearman_test = cor.test(data[,i], data[,22], method = "spearman") 
+    corr_coef = spearman_test$estimate 
+    p_val = spearman_test$p.value
+  
+    # Add row to matrix 
+    pair = matrix(ncol = 2, nrow = 1) 
+    pair[1][1] = corr_coef 
+    pair[2][1] = p_val 
+    corr_matrix <- rbind(corr_matrix, pair) 
+    rownames(corr_matrix)[nrow(corr_matrix)] <- colnames(data)[i]
+  }
+}
+print(corr_matrix)
+```
+
+Amb els resultats obtinguts d'aquest segon test, es pot observar com la variable més rellevant, en la determinació de si plou o no (RainToday), és "Rainfall", seguit de "Humidity9am" i "Sunshine", cal remarcar que els valors obtingut de R^2 no són gaire elevats.
+
+### - Contrast d’hipòtesis
+
+En aquest apartat, es decideix determinar si hi ha una fracció del cel enfosquit pels núvols a les 9h00 del matí igual a l'estiu que a l'hivern. Per respondre aquesta hipòtesi, es divideix la mostra en dos conjunts segons la estació meteorològica desitjada (realitzar en l'apartat "Selecció dels grups de dades que es volen analitzar/comparar").
+
+El contrast que s'aplicarà és sobre dues mostres i per diferència de mitjanes, a continuació es formulen les hipòtesis nul·la i alternativa :
+
+*H0 : μ1 − μ2 = 0 
+*H1 : μ1 − μ2 < 0
+
+*μ1 -> Mitjana del conjunt dataFinal.hivern$Cloud9am
+*μ2 -> Mitjana del conjunt dataFinal.estiu$Cloud9am
+
+α = 0, 05.
+
+```{r,warning=FALSE,message=FALSE}
+# Contrast d'hipòtesis
+t.test(dataFinal.hivern$Cloud9am, dataFinal.estiu$Cloud9am, alternative = "less")
+```
+
+Com era d'esperar, s'obté un p-valor inferior al valor de significació i per tant, es rebutja la hipòtesi nul·la que mantenia la igualitat de núvols en les estacions d'hivern i estiu. Obviament, a l'hivern hi haurà mes núvols i períodes de cel "engrisat".
+
+### - Model de regresió lineal
+
+Per obtenir un model de regressió que s'ajusti amb un grau considerable de precisió, s'han de definir aquelles variables que estan més correlacionades amb la variable que es vol obtenir/estudiar. L'anàlisi ja ha estat efectuat en els altres apartats i les variables que es pendran en compte són les següents :
+
+Rainfall, Humidity9am, Sunshine, MinTemp, MaxTemp, Pressure3pm, Temp3pm i Cloud3pm.
+
+A continuació es crearan diferents models de regressió amb l'objectiu de triar aquell que millor interpreti les dades. Cal tenir en compte que la variable a preedir és binomial i per tant, els processos poden presentar certs dubtes que no apareixerien si es tingués una variable numérica. Com per exemple passaria en un hipotètic estudi de la temperatura a la ciutat de Sydney, si es vol predir la temperatura dels pròxims mesos.
+El problema que ha estat escollit en aquest projecte correspon a predir la variable "RainTomorrow" i per tant, saber si demà plourà.
+
+```{r,warning=FALSE,message=FALSE}
+library(ROCR)
+```
+```{r,warning=FALSE,message=FALSE}
+# Regresors quantitatius
+Rainfall = data$Rainfall
+Humidity9am = data$Humidity9am
+Sunshine = data$Sunshine
+MinTemp = data$MinTemp
+MaxTemp = data$MaxTemp
+Pressure3pm = data$Pressure3pm
+Temp3pm = data$Temp3pm
+Cloud3pm = data$Cloud3pm
+
+# Variable a predir
+RainTomorrow = data$RainTomorrow
+
+# Model de regressió lineal 1
+model <- lm(RainTomorrow ~ Rainfall + Humidity9am + Sunshine + MinTemp + MaxTemp + Pressure3pm + Cloud3pm + Temp3pm, data = data)
+summary(model)
+
+# Model de regressió lineal 2
+model2 = glm(formula = RainTomorrow ~ Rainfall + Humidity9am + Sunshine + 
+                MinTemp + MaxTemp + Pressure3pm + Cloud3pm + Temp3pm,
+                family = binomial,
+                data = data)
+summary(model2)
+
+
+# Predicció i ROC amb el model 2
+prob_pred = predict(model2, type = 'response')
+ROCRpred <- prediction(prob_pred, data$RainTomorrow)
+ROCRperf <- performance(ROCRpred, 'tpr','fpr')
+plot(ROCRperf, colorize = TRUE, text.adj = c(-0.2,1.7))
+
+# Model de regressió lineal 3 & ANOVA
+model3 = glm(formula = RainTomorrow ~ Rainfall + Humidity9am + Sunshine + 
+                MinTemp + MaxTemp + Pressure3pm + Cloud3pm + Temp3pm,
+                family = binomial,
+                data = data)
+caret::varImp(model3)
+anova(model3, test = "Chisq")
+```
+
+## Conclusions
+
+L'estudi presentat anteriorment és fruit d'una llarga llista d'etapes, començant en primer lloc per la captura de les dades, que en aquest cas ha estat la localització d'un dataset (Kaggle) que s'acotés a les necessitats del problema. Un cop obtingut el dataset, s'ha procedit a la seva inserció al programa analític per un posterior preprocessat. Al llarg del projecte s'ha pogut observar la importància de la fase de visulització i representació de gràfics, tant per fer hipòtesis, com comparacions. 
+
+L'etapa més dificultosa i mandrosa, sempre resulta ser la neteja de dades, amb l'anàlisi de valors buits i extrems. La metodologia aplicada ha estat força directa, degut al nombre elevat de dades s'ha decidit per suprimir aquells registres que no coincidien amb un valor estàndard o llògic.
+
+A continuació s'ha arribat a l'etapa d'anàlisi i és aquí on s'han trobat les conclusions més importants. Primer de tot, s'han detallat les variables amb una correlació més elevada, respecte l'hipòtesi de pluja, i la guanyadora ha estat "Rainfall", com és força evident. Amb els models de regressió s'han pogut comprovar quines variables tenen més influència i quines són menys rellevants. S'han vist també les proves de ROC i el model ANOVA en certa mesura. 
+
+Personalment, hem quedo amb les ganes d'analitzar en més profunditat el dataset escollit, però estic satisfet de l'anàlisi realitzat. Encara es podria extreure molt de coneixement amb aquestes dades, com un model de predicció sobre la temperatura a Austràlia, o la humitat per poblacions, etc .. 
+
+# Recursos
+
+* Vegas, E. (2017). Preprocesamiento de datos. Material UOC.
+* Gibergans, J. (2017). Regresión lineal múltiple. Material UOC.
+* Rovira, C. (2008). Contraste de hipótesis. Material UOC.
+* http://www.r-tutor.com/elementary-statistics/non-parametric-methods/mann-whitney-wilcoxon-test
+* https://www.r-graph-gallery.com/
+* https://www.kaggle.com/jsphyg/weather-dataset-rattle-package (Kernels)
